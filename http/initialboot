@@ -16,7 +16,7 @@ sed -i 's|^vagrant:[^:]*|vagrant:$6$nvsPJ3HL$KTmBLf4xWsT6duVFBLPnlg4Eq0MpZ7vCb1T
 /usr/sbin/usermod -P'Primary Administrator' vagrant
 /usr/sbin/groupadd sudo
 /usr/sbin/usermod -G sudo vagrant
-echo '%sudo ALL=(ALL) ALL' > /etc/sudoers.d/group_sudo
+echo '%sudo ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/group_sudo
 ### END_USER
 ### BEGIN_ROOTPW
 sed -i 's|^root:[^:]*|root:$6$1JZbHn3A$x5tL15cEU0ePuFR8AC9s/52hjd6.M70BjLHXn9Q78CyDY6JM.O4il29obCzxfPfIyel28tYe7MYwBha.CVj2/1|' /etc/shadow

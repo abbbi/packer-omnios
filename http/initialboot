@@ -1,0 +1,45 @@
+/usr/sbin/dumpadm -y -c curproc -d /dev/zvol/dsk/rpool/dump
+zpool set cachefile=/etc/zfs/zpool.cache rpool
+/usr/sbin/svccfg -s system/keymap:default setprop keymap/layout = 'US-English'
+/usr/sbin/svcadm refresh system/keymap:default
+/usr/sbin/svcadm restart system/keymap:default
+### BEGIN_USER
+/sbin/zfs destroy -r rpool/export
+/sbin/zfs create -o mountpoint=/home rpool/home
+chmod 0555 /home
+/usr/sbin/useradd -D -b /home
+sed -i '/^MANAGE_ZFS=NO/s/^/#/' /etc/default/useradd
+sed -i '/^#MANAGE_ZFS=YES/s/#//' /etc/default/useradd
+/usr/sbin/useradd -mz vagrant
+/usr/sbin/usermod -s /bin/ksh vagrant
+sed -i 's|^vagrant:[^:]*|vagrant:$6$nvsPJ3HL$KTmBLf4xWsT6duVFBLPnlg4Eq0MpZ7vCb1TYCXFm3dfP2o2yJw7txOuRKjco8KgRJO9zWW0H7pEtbhU/ja4J.0|' /etc/shadow
+/usr/sbin/usermod -P'Primary Administrator' vagrant
+/usr/sbin/groupadd sudo
+/usr/sbin/usermod -G sudo vagrant
+echo '%sudo ALL=(ALL) ALL' > /etc/sudoers.d/group_sudo
+### END_USER
+### BEGIN_ROOTPW
+sed -i 's|^root:[^:]*|root:$6$1JZbHn3A$x5tL15cEU0ePuFR8AC9s/52hjd6.M70BjLHXn9Q78CyDY6JM.O4il29obCzxfPfIyel28tYe7MYwBha.CVj2/1|' /etc/shadow
+### END_ROOTPW
+### BEGIN_VTDAEMON
+/usr/sbin/svcadm enable vtdaemon
+for i in `seq 2 6`; do
+	/usr/sbin/svcadm enable console-login:vt$i
+done
+/usr/sbin/svccfg -s vtdaemon setprop options/hotkeys=true
+/usr/sbin/svccfg -s vtdaemon setprop options/secure=false
+/usr/sbin/svcadm refresh vtdaemon
+/usr/sbin/svcadm restart vtdaemon
+### END_VTDAEMON
+
+# VAGRANT
+echo "Setting the vagrant ssh pub key"
+mkdir /home/vagrant/.ssh
+chmod 700 /home/vagrant/.ssh
+touch /home/vagrant/.ssh/authorized_keys
+echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key' >> /home/vagrant/.ssh/authorized_keys
+chmod 600 /home/vagrant/.ssh/authorized_keys
+chown -R vagrant:staff /home/vagrant/.ssh
+
+ipadm create-if e1000g0
+ipadm create-addr -T dhcp e1000g0/v4

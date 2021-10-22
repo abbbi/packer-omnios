@@ -1,0 +1,66 @@
+{
+  "builders": [
+    {
+      "accelerator": "kvm",
+      "boot_command": [
+        "<enter><wait15>",
+        "T<enter><wait10>",
+        "<enter><wait5>",
+        "<enter><wait5>",
+        "1<enter><wait5>",
+        "0<enter>",
+        "<enter>",
+        "<enter>",
+        "8<enter>",
+        "15<enter>",
+        "1<enter>",
+        "1<enter><wait50>",
+        "<enter>",
+        "1<enter>",
+        "4<enter>",
+        "<enter>",
+        "2<enter><wait>",
+        "ipadm create-if e1000g0<enter><wait2>",
+        "ipadm create-addr -T dhcp e1000g0/v4<enter><wait10>",
+        "curl http://{{ .HTTPIP }}:{{ .HTTPPort }}/initialboot > /mnt/.initialboot<enter>",
+        "exit<enter>",
+        "4<enter>"
+      ],
+      "boot_wait": "5s",
+      "disk_cache": "writethrough",
+      "disk_interface": "ide",
+      "disk_size": "{{ user `disk_size`}}",
+      "format": "qcow2",
+      "iso_checksum": "md5:7637d68fc018a9793ce55061a89b71ea",
+      "iso_url": "omnios-r151038v.iso",
+      "memory": "{{ user `memory_size`}}",
+      "net_device": "e1000",
+      "output_directory": "packer-omnios",
+      "qemuargs": [
+        [
+          "-cpu",
+          "host"
+        ]
+      ],
+      "type": "qemu",
+      "vm_name": "packer-omnios",
+      "communicator": "none",
+      "http_directory": "http" 
+    }
+  ],
+  "post-processors": [
+    {
+      "compression_level": 9,
+      "vagrantfile_template": "Vagrantfile",
+      "output": "./builds/{{.Provider}}/omnios.box",
+      "type": "vagrant"
+    }
+  ],
+  "variables": {
+    "disk_size": "40G",
+    "memory_size": "2048",
+    "password": "vagrant",
+    "user": "vagrant"
+  }
+}
+

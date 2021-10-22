@@ -42,5 +42,6 @@ chmod 600 /home/vagrant/.ssh/authorized_keys
 chown -R vagrant:staff /home/vagrant/.ssh
 
 echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+cp /etc/nsswitch.{dns,conf}
 ipadm create-if e1000g0
 ipadm create-addr -T dhcp e1000g0/v4

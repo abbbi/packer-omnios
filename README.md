@@ -9,4 +9,5 @@ Based on omnios-r151038v.iso
 Build via:
 
  wget https://downloads.omnios.org/media/stable/omnios-r151038v.iso
+ 
  packer build omnios.json

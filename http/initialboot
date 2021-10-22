@@ -41,5 +41,6 @@ echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4
 chmod 600 /home/vagrant/.ssh/authorized_keys
 chown -R vagrant:staff /home/vagrant/.ssh
 
+echo "nameserver 8.8.8.8" >> /etc/resolv.conf
 ipadm create-if e1000g0
 ipadm create-addr -T dhcp e1000g0/v4
